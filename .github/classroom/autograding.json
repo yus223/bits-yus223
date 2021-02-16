@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "runTests",
+      "setup": "make clean; make",
+      "run": "bash runTests.sh",
+      "input": "",
+      "output": "",
+      "comparison": "included",
+      "timeout": 3,
+      "points": null
+    }
+  ]
+}
