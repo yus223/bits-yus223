@@ -120,14 +120,11 @@ int main(int argc, char *argv[]) {
 
   //present in the form of integer
   hex.s = (hex.c[0] << 24) + (hex.c[1] << 16) + (hex.c[2] << 8) + hex.c[3];
-  printf("\nSigned Int: %d\n", hex.s);
 
   //change the integer to an unsigned int because they have the same magnitude
   hex.u = hex.s + UINT32_MAX+1;
-  printf("Unsigned Int: %u\n", hex.u);
-
-  //change the bytes to float
-  printf("Float: %+g\n", hex.f);
+  printf("\nUnsigned Int: %u\n", hex.u);
+  printf("Signed Int: %d\n", hex.s);
 
   //print in floating point form
   int exponent = 0; int times = 7; long double single_bit = 1; char sign ='a';
@@ -162,25 +159,26 @@ int main(int argc, char *argv[]) {
   //denormalized case
   if(exponent == 0)
   {
-    printf("%c",sign);
+    printf("Floating Point Binary: %c",sign);
     printf("0.");
     for(i = 22; i>=0; i--)
     {
       printf("%d", bits[i]);
     }
-    printf("x2^-126");
+    printf("x2^-126\n");
   }
 
+  int jump = 0;
   //normalized case
   if(exponent < 255 && exponent >=1)
   {
-    printf("%c",sign);
+    printf("Floating Point Binary: %c",sign);
     printf("1.");
     for(i = 22; i>=0; i--)
     {
       printf("%d", bits[i]);
     }
-    printf("x2^%d", (exponent-127));
+    printf("x2^%d\n", (exponent-127));
   }
   //special case
   else if(exponent == 255)
@@ -189,10 +187,19 @@ int main(int argc, char *argv[]) {
     {
       if(bits[i]==1)
       {
-        printf("NaN");
+        printf("Floating Point Binary: NaN\n");
+        jump = 1;
         break;
       }
     }
-    printf("Infinity");
+    if(jump == 0)
+    {
+      printf("Floating Point Binary: %c", sign);
+      printf("Inf\n");
+    }
   }
+
+  //change the bytes to float
+  printf("Float Point Decimal: %+g\n", hex.f);
+  return 0;
 }
