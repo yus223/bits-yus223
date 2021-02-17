@@ -165,20 +165,54 @@ int main(int argc, char *argv[]) {
     {
       printf("%d", bits[i]);
     }
-    printf("x2^-126\n");
+    printf("x2^-01111110\n");
   }
 
   int jump = 0;
   //normalized case
   if(exponent < 255 && exponent >=1)
   {
-    printf("Floating Point Binary: %c",sign);
-    printf("1.");
-    for(i = 22; i>=0; i--)
+    int bits2[7]; int binary_e; char sign2 ='a';
+    if(exponent-127!= 0)
     {
-      printf("%d", bits[i]);
+      printf("Floating Point Binary: %c",sign);
+      printf("1.");
+      for(i = 22; i>=0; i--)
+      {
+        printf("%d", bits[i]);
+      }
+      if(exponent<127)
+      {
+        binary_e = 127 - exponent;
+        sign2 = '-';
+      }
+      else
+      { 
+        binary_e = exponent-127;
+        sign2 = '+';
+      }
+      for(i=0;binary_e>0;i++)    
+      {    
+        bits2[i]=binary_e%2;    
+        binary_e=binary_e/2;    
+      }    
+      printf("x2^%c", sign2);
+      for(i=7;i>=0;i--)
+      {
+        printf("%d",bits2[i]);
+      }
+      printf("\n");
     }
-    printf("x2^%d\n", (exponent-127));
+    else
+    {
+      printf("Floating Point Binary: %c",sign);
+      printf("1.");
+      for(i = 22; i>=0; i--)
+      {
+        printf("%d", bits[i]);
+      }
+      printf("x2^+00000000\n");
+    }
   }
   //special case
   else if(exponent == 255)
