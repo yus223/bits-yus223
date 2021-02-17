@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 
   //check the endian of the running computer
   int see_endian = strcmp(argv[1], "-e"); 
-
+  num_t hex;
   //0 if the system is small endian, 1 otherwise
   int big_small = 0;
   if(see_endian == 0)
@@ -71,24 +71,23 @@ int main(int argc, char *argv[]) {
 
   //if the argv[] is a valid hex number than proceed to the approach part
   //read command line into 4 character array
-  unsigned char hex [4];
   int num = (int)strtol(argv[1], NULL, 16);
 
   //save the number into 4 character bytes
   if(big_small==0)
   {
-    hex[0] = (num >> 24) & 0xFF;
-    hex[1] = (num >> 16) & 0xFF;
-    hex[2] = (num >> 8) & 0xFF;
-    hex[3] = num & 0xFF;
+    hex.c[0] = (num >> 24) & 0xFF;
+    hex.c[1] = (num >> 16) & 0xFF;
+    hex.c[2] = (num >> 8) & 0xFF;
+    hex.c[3] = num & 0xFF;
   }
   //if big endian, simply reverse the order of little endian
   else
   {
-    hex[3] = (num >> 24) & 0xFF;
-    hex[2] = (num >> 16) & 0xFF;
-    hex[1] = (num >> 8) & 0xFF;
-    hex[0] = num & 0xFF;
+    hex.c[3] = (num >> 24) & 0xFF;
+    hex.c[2] = (num >> 16) & 0xFF;
+    hex.c[1] = (num >> 8) & 0xFF;
+    hex.c[0] = num & 0xFF;
   }
 
   //convert bytes into bits form(binary)
@@ -98,19 +97,19 @@ int main(int argc, char *argv[]) {
 
   for(i = 0; i<8; i++)
   {
-    bits[i] = (hex[3] & (mask << i)) != 0;
+    bits[i] = (hex.c[3] & (mask << i)) != 0;
   } 
   for(i = 8; i<16; i++)
   {
-    bits[i] = ((hex[2] << 8) & (mask << i)) != 0;
+    bits[i] = ((hex.c[2] << 8) & (mask << i)) != 0;
   } 
   for(i = 16; i<24; i++)
   {
-    bits[i] = ((hex[1] << 16) & (mask << i)) != 0;
+    bits[i] = ((hex.c[1] << 16) & (mask << i)) != 0;
   } 
   for(i = 24; i<32; i++)
   {
-    bits[i] = ((hex[0] << 24) & (mask << i)) != 0;
+    bits[i] = ((hex.c[0] << 24) & (mask << i)) != 0;
   } 
 
   //print out the correct binary representation in reverse due to the saving method
@@ -120,11 +119,80 @@ int main(int argc, char *argv[]) {
   }
 
   //present in the form of integer
-  signed int signed_int = (hex[0] << 24) + (hex[1] << 16) + (hex[2] << 8) + hex[3];
-  printf("\nSigned Int: %d\n", signed_int);
+  hex.s = (hex.c[0] << 24) + (hex.c[1] << 16) + (hex.c[2] << 8) + hex.c[3];
+  printf("\nSigned Int: %d\n", hex.s);
 
-  unsigned int unsigned_int = (hex[0] << 24) + (hex[1] << 16) + (hex[2] << 8) + hex[3];
-  printf("Unsigned Int: %u\n", unsigned_int);
-  
-  
+  //change the integer to an unsigned int because they have the same magnitude
+  hex.u = hex.s + UINT32_MAX+1;
+  printf("Unsigned Int: %u\n", hex.u);
+
+  //change the bytes to float
+  printf("Float: %+g\n", hex.f);
+
+  //print in floating point form
+  int exponent = 0; int times = 7; long double single_bit = 1; char sign ='a';
+  //find the sign
+  if(bits[31]==0)
+  {
+    sign = '+';
+  }
+  else
+  {
+    sign = '-';
+  }
+  //find the exponent
+  for(i = 30; i>22; i--)
+  {
+    if(times==0)
+    {
+      if(bits[i]==1)
+      {
+        exponent += 1;
+      }
+      break;
+    }
+    for(int j = times; j > 0; j--)
+    {
+      single_bit *= bits[i] * 2;
+    }
+    exponent += single_bit;
+    single_bit = 1;
+    times--;
+  }
+  //denormalized case
+  if(exponent == 0)
+  {
+    printf("%c",sign);
+    printf("0.");
+    for(i = 22; i>=0; i--)
+    {
+      printf("%d", bits[i]);
+    }
+    printf("x2^-126");
+  }
+
+  //normalized case
+  if(exponent < 255 && exponent >=1)
+  {
+    printf("%c",sign);
+    printf("1.");
+    for(i = 22; i>=0; i--)
+    {
+      printf("%d", bits[i]);
+    }
+    printf("x2^%d", (exponent-127));
+  }
+  //special case
+  else if(exponent == 255)
+  {
+    for(i = 22; i>=0; i--)
+    {
+      if(bits[i]==1)
+      {
+        printf("NaN");
+        break;
+      }
+    }
+    printf("Infinity");
+  }
 }
