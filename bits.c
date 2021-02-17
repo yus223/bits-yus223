@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     {}
 	  else
     {
-      printf( " The entered input is not a hexadecimal number. \n" );
+      printf( "Invalid input\n" );
       return 0;
     }
   }
@@ -117,14 +117,15 @@ int main(int argc, char *argv[]) {
   {
     printf("%d", bits[i]);
   }
+  printf("     ");
 
   //present in the form of integer
   hex.s = (hex.c[0] << 24) + (hex.c[1] << 16) + (hex.c[2] << 8) + hex.c[3];
 
   //change the integer to an unsigned int because they have the same magnitude
   hex.u = hex.s + UINT32_MAX+1;
-  printf("\nUnsigned Int: %u\n", hex.u);
-  printf("Signed Int: %d\n", hex.s);
+  printf("%-15u", hex.u);
+  printf("%-15d", hex.s);
 
   //print in floating point form
   int exponent = 0; int times = 7; long double single_bit = 1; char sign ='a';
@@ -159,23 +160,23 @@ int main(int argc, char *argv[]) {
   //denormalized case
   if(exponent == 0)
   {
-    printf("Floating Point Binary: %c",sign);
+    printf("%c",sign);
     printf("0.");
     for(i = 22; i>=0; i--)
     {
       printf("%d", bits[i]);
     }
-    printf("x2^-01111110\n");
+    printf("x2^-01111110     ");
   }
 
   int jump = 0;
   //normalized case
   if(exponent < 255 && exponent >=1)
   {
-    int bits2[7]; int binary_e; char sign2 ='a';
-    if(exponent-127!= 0)
+    char bits2[7]; int binary_e = 0; char sign2 ='a';
+    if(exponent-127 != 0)
     {
-      printf("Floating Point Binary: %c",sign);
+      printf("%c",sign);
       printf("1.");
       for(i = 22; i>=0; i--)
       {
@@ -192,48 +193,55 @@ int main(int argc, char *argv[]) {
         sign2 = '+';
       }
       for(i=0;binary_e>0;i++)    
-      {    
+      { 
         bits2[i]=binary_e%2;    
         binary_e=binary_e/2;    
-      }    
+      }  
       printf("x2^%c", sign2);
-      for(i=7;i>=0;i--)
+      if(exponent==128)
       {
-        printf("%d",bits2[i]);
+        printf("00000001     ");
       }
-      printf("\n");
+      else
+      {
+        for(i=7;i>=0;i--)
+        {
+          printf("%d",bits2[i]);
+        }
+      }
+      printf("     ");
     }
     else
     {
-      printf("Floating Point Binary: %c",sign);
+      printf("%c",sign);
       printf("1.");
       for(i = 22; i>=0; i--)
       {
         printf("%d", bits[i]);
       }
-      printf("x2^+00000000\n");
+      printf("x2^+00000000     ");
     }
   }
   //special case
+
   else if(exponent == 255)
   {
     for(i = 22; i>=0; i--)
     {
       if(bits[i]==1)
       {
-        printf("Floating Point Binary: NaN\n");
+        printf("%-10s", "NaN");
         jump = 1;
         break;
       }
     }
     if(jump == 0)
     {
-      printf("Floating Point Binary: %c", sign);
-      printf("Inf\n");
+      printf("%-10c%s", sign, "Inf");
     }
   }
 
   //change the bytes to float
-  printf("Float Point Decimal: %+g\n", hex.f);
+  printf("%+g\n", hex.f);
   return 0;
 }
