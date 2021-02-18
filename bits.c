@@ -16,6 +16,7 @@
 #include <stdio.h> /* for printf, fprintf, etc. */
 #include<ctype.h>
 #include<stdlib.h>
+#include <math.h>
 #include <string.h>
 
 /* You are required to use the following union typedef. Doing so will prevent compiler warnings
@@ -242,6 +243,11 @@ int main(int argc, char *argv[]) {
   }
 
   //change the bytes to float
+  if(isnan(hex.f))
+  {
+    printf("nan\n");
+    return 0;
+  }
   printf("%+g\n", hex.f);
   return 0;
 }
