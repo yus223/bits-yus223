@@ -123,7 +123,7 @@ int main(int argc, char *argv[]) {
   hex.s = (hex.c[0] << 24) + (hex.c[1] << 16) + (hex.c[2] << 8) + hex.c[3];
 
   //change the integer to an unsigned int because they have the same magnitude
-  hex.u = hex.s + UINT32_MAX+1;
+  hex.u =(unsigned int)hex.s;
   printf("%-15u", hex.u);
   printf("%-15d", hex.s);
 
